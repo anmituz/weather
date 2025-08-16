@@ -1,103 +1,70 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
+import JapanMap, { City } from '@/components/JapanMap';
+import WeatherDisplay, { WeatherData } from '@/components/WeatherDisplay';
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  const showDummyWeather = (cityName: string) => {
+    // 本来はここでAPIを叩く
+    // 今回はダミーデータを設定
+    const dummyWeather: WeatherData = {
+      cityName: cityName,
+      temperature: Math.round(Math.random() * 20 + 10), // 10〜30度のランダムな気温
+      description: ['晴れ', '曇り', '雨'][Math.floor(Math.random() * 3)],
+      humidity: Math.round(Math.random() * 50 + 40), // 40〜90%のランダムな湿度
+      windSpeed: Math.round(Math.random() * 5 + 1), // 1〜6m/sのランダムな風速
+    };
+    setWeather(dummyWeather);
+  };
+
+  const handleCityClick = (city: City) => {
+    showDummyWeather(city.name);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return; // 空の場合は何もしない
+    showDummyWeather(searchQuery);
+  };
+
+  const handleCloseWeather = () => {
+    setWeather(null);
+  };
+
+  return (
+    <div>
+      <h2 className="text-2xl font-bold mb-4">日本全国 天気予報</h2>
+      
+      {/* 天気カードが表示されている時は検索フォームと地図を隠す */}
+      {weather ? (
+        <WeatherDisplay weather={weather} onClose={handleCloseWeather} />
+      ) : (
+        <>
+          {/* 検索フォーム */}
+          <form onSubmit={handleSearch} className="mb-6 flex justify-center">
+            <input 
+              type="text" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="市区町村名で検索 (例: 東京都千代田区)"
+              className="border border-gray-300 rounded-l-md p-2 w-full max-w-md"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+            <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700">
+              検索
+            </button>
+          </form>
+
+          {/* 地図 */}
+          <p className="mb-4 text-center">または、地図上の都市をクリックしてください。</p>
+          <div className="flex justify-center">
+            <JapanMap onCityClick={handleCityClick} />
+          </div>
+        </>
+      )}
     </div>
   );
 }
